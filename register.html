@@ -7,8 +7,6 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
-
-    <title>forgot page</title>
     <style>
       * {
         margin: 0;
@@ -16,33 +14,55 @@
         box-sizing: border-box;
         font-family: "Poppins", sans-serif;
       }
-      #forgotForm{
-        background-color: aliceblue;
-       height: 400px;
-      max-width: 900px;
-      width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        gap:9%;
-        border: 1px solid black;
-        border-radius: 7px;
-        padding: 0px 10px 0px 10px;
-      }
-      input{
-        width: auto;
-        height: 35px;
-        border: none;
-        border-bottom: 1px solid black;
-        border-radius: 3px;
-        padding-left: 10px;
-      }
       body {
         height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
+      }
+      .wrapper {
+        background-color: aliceblue;
+        height: 400px;
+        max-width: 900px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid black;
+        border-radius: 10px;
+        overflow: hidden;
+        gap: 1vh;
+      }
+      .input-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 18px;
+      }
+      form {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 7%;
+      }
+      input {
+        height: 5vh;
+        width: 25vw;
+        padding-left: 2vh;
+        border-radius: 3px;
+        border: none;
+        border-bottom: 1px solid black;
+      }
+      input:focus {
+        box-shadow: 0 0 8px rgba(172, 133, 245, 0.8);
+        outline: none;
+      }
+      .inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 2vh;
       }
       .btn {
         height: 5vh;
@@ -52,7 +72,6 @@
         font-weight: bold;
         border-radius: 4px;
       }
-    
       .btn:hover {
         box-shadow: 0 0 8px rgba(172, 133, 245, 0.8);
         outline: none;
@@ -65,80 +84,87 @@
           font-size: 28px;
         }
 
-        #forgotForm {
+        .wrapper {
           width: 95%;
-          height: 400px;
         }
         input {
           width: 50vw;
         }
       }
     </style>
+
+    <title>Register page</title>
   </head>
   <body>
-      
-      <form action="" id="forgotForm">
-        <div class="heading"><h1>Enter your Email</h1></div>
-        <div class="para">
-        <p>
-          A Otp will be send to your registered Email, Enter your email Below
-        </p>
-        </div>
-
+    <div class="wrapper">
+      <form action="" id="registerForm">
+        <div class="heading"><h1>Create Account</h1></div>
         <div class="inputs">
+          <div class="input-box">
+            <i class="fa fa-user"></i>
+            <input type="text" placeholder="Username" required id="username" />
+          </div>
+
           <div class="input-box">
             <i class="fa fa-envelope"></i>
             <input type="email" placeholder="Email" required id="email" />
           </div>
+
+          <div class="input-box">
+            <i class="fa-solid fa-key"></i>
+            <input
+              type="password"
+              placeholder="Password"
+              required
+              id="password"
+            />
+          </div>
         </div>
 
         <div class="login-button">
-          <button type="submit" class="btn">Send OTP</button>
+          <button type="submit" class="btn">Register</button>
         </div>
         <div class="back-page">
           <a href="index.html">Back to page</a>
         </div>
       </form>
+    </div>
     <script>
       document
-        .getElementById("forgotForm")
-        .addEventListener("submit", async function (e) {
+        .getElementById("registerForm")
+        .addEventListener("submit", function (e) {
           e.preventDefault();
 
+          const username = document.getElementById("username").value;
+          const password = document.getElementById("password").value;
           const email = document.getElementById("email").value;
-          const button = document.querySelector(".btn");
 
-          button.disabled = true;
-          button.innerText = "Sending OTP...";
-
-          try {
-            const response = await fetch(
-              "https://login-page-rxnz.onrender.com/unicore/auth/send-otp",
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
+          fetch(
+            "https://login-page-rxnz.onrender.com/unicore/auth/register",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            );
-
-            // ❌ if HTTP error → go to catch
-            if (!response.ok) {
-              const errorMsg = await response.text();
-              throw new Error(errorMsg || "Failed to send OTP");
-            }
-
-            // ✅ success response
-            const data = await response.text();
-
-            alert("✅ OTP sent successfully");
-            window.location.href = "enter-otp.html";
-          } catch (error) {
-            alert("❌ " + error.message);
-            console.error(error);
-          } finally {
-            button.disabled = false;
-            button.innerText = "Send OTP";
-          }
+              body: JSON.stringify({
+                username,
+                password,
+                email,
+              }),
+            },
+          )
+            .then((response) => {
+              if (!response.ok) {
+                alert("Issues in Registering user");
+              } else {
+                alert("User Registered Successfully ✅");
+                return (window.location.href = "index.html");
+              }
+            })
+            .catch((err) => {
+              alert("Invalid username or password");
+              console.error(err);
+            });
         });
     </script>
   </body>
