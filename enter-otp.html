@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <title>Enter Otp</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .wrapper {
+        background-color: aliceblue;
+        height: 400px;
+        max-width: 900px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid black;
+        border-radius: 10px;
+        overflow: hidden;
+        gap: 1vh;
+      }
+      form {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 6vh;
+      }
+      .inputs {
+        display: flex;
+        gap: 6px;
+      }
+
+      .all-inputs {
+        height: 45px;
+        width: 45px;
+        border: 1px solid black;
+        border-radius: 8px;
+        font-size: 30px;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+      }
+      input:focus {
+        box-shadow: 0 0 8px rgba(172, 133, 245, 0.8);
+        text-decoration: none;
+        outline: none;
+      }
+      .btn {
+        height: 5vh;
+        width: 20vh;
+        background-color: blue;
+        color: white;
+        font-weight: bold;
+        border-radius: 4px;
+      }
+      .para {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        bottom: 5vh;
+        left: 3vh;
+      }
+      .btn:hover {
+        box-shadow: 0 0 8px rgba(172, 133, 245, 0.8);
+        outline: none;
+      }
+      a {
+        text-decoration: none;
+      }
+      @media (max-width: 768px) {
+        .wrapper {
+          width: 95%;
+        }
+      }
+      @media (max-width: 480px) {
+        .all-inputs {
+          width: 35px;
+          height: 35px;
+          font-size: 16px;
+        }
+        .para{
+          font-size:15px;
+        }
+        .heading{
+          font-size: 15px;
+        }
+
+        .inputs {
+          gap: 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <form action="" id="verify-otp">
+        <div class="heading"><h1>Enter OTP</h1></div>
+        <div class="para">
+          <p>Enter the OTP sent to your registered Email</p>
+        </div>
+
+        <div class="inputs">
+          <input
+            type="text"
+            name=""
+            class="all-inputs"
+            maxlength="1"
+            required
+          />
+          <input
+            type="text"
+            name=""
+            class="all-inputs"
+            maxlength="1"
+            required
+          />
+          <input
+            type="text"
+            name=""
+            class="all-inputs"
+            maxlength="1"
+            required
+          />
+          <input
+            type="text"
+            name=""
+            class="all-inputs"
+            maxlength="1"
+            required
+          />
+          <input
+            type="text"
+            name=""
+            class="all-inputs"
+            maxlength="1"
+            required
+          />
+          <input
+            type="text"
+            name=""
+            class="all-inputs"
+            maxlength="1"
+            required
+          />
+        </div>
+        <div class="login-button">
+          <button type="submit" class="btn">Verify OTP</button>
+        </div>
+        <div class="back-page">
+          <a href="index.html">Back to page</a>
+        </div>
+      </form>
+    </div>
+    <script>
+      const inputs = document.querySelectorAll(".all-inputs"); //array
+
+      inputs.forEach((input, index) => {
+        // when user types
+        input.addEventListener("input", () => {
+          // allow only digits
+          input.value = input.value.replace(/[^0-9]/g, "");
+
+          // move to next input
+          if (input.value && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+          }
+        });
+
+        // when user presses backspace
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace" && !input.value && index > 0) {
+            inputs[index - 1].focus();
+          }
+        });
+      });
+
+      document
+        .getElementById("verify-otp")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          function getOtp() {
+            let otp = "";
+            inputs.forEach((input) => (otp += input.value));
+            return otp;
+          }
+
+          const otp = getOtp();
+          let resetToken = "";
+
+          fetch(
+            "https://login-page-rxnz.onrender.com/unicore/auth/verify-otp",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                otp,
+              }),
+            },
+          )
+            .then((response) => {
+              if (!response.ok) {
+                return response.text().then((msg) => {
+                  alert(msg); //  actual backend message
+                  throw new Error(msg); // stop next .then()
+                });
+              }
+              return response.text(); // backend returns token as String
+            })
+            .then((token) => {
+              // delete token if pre exist
+
+              if (localStorage.getItem("resetToken")) {
+                localStorage.removeItem("resetToken");
+              }
+
+              alert("OTP Verification Successful");
+              window.location.href = "reset-password.html";
+
+              // token received
+              localStorage.setItem("resetToken", token);
+            })
+            .catch((error) => {
+              alert("You Entered Wrong OTP");
+              console.error(error);
+            });
+        });
+    </script>
+  </body>
+</html>
